@@ -59,7 +59,7 @@ defmodule Cog.Mixfile do
   end
 
   defp deps do
-    [{:slack, github: "BlakeWilliams/Elixir-Slack"},
+    [{:slack, "~> 0.7.0"},
      {:websocket_client, github: "jeremyong/websocket_client"},
      {:poison, "~> 1.5.2"},
      {:ibrowse, "~> 4.2.2", override: true},
