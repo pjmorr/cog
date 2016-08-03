@@ -10,7 +10,6 @@ defmodule Cog do
                 supervisor(Cog.CoreSup, [])]
 
     opts = [strategy: :one_for_one, name: Cog.Supervisor]
->>>>>>> WIP
     case Supervisor.start_link(children, opts) do
       {:ok, top_sup} ->
         # Verify the latest schema migration after starting the database worker
