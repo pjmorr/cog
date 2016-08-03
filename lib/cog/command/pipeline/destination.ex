@@ -82,7 +82,7 @@ defmodule Cog.Command.Pipeline.Destination do
   defp resolve_destination(%__MODULE__{raw: "here"}=dest, _sender, origin_room, adapter),
     do: {:ok, %{dest | adapter: adapter.name, room: origin_room}}
   defp resolve_destination(%__MODULE__{raw: "me"}=dest, sender, _origin_room, adapter) do
-    user_id = sender["id"]
+    user_id = sender.id
     case adapter.lookup_direct_room(user_id: user_id) do # TODO: user should be opaque to all but adapter?
       {:ok, direct_chat} ->
         {:ok, %{dest | adapter: adapter.name, room: direct_chat}}
@@ -95,7 +95,7 @@ defmodule Cog.Command.Pipeline.Destination do
     {adapter, destination} = adapter_destination(redir, origin_adapter)
     case adapter.lookup_room(destination) do
       {:ok, room} ->
-        if adapter.room_writeable?(id: room.id) == true do # TODO: just pass the room entirely
+        if adapter.room_writeable?(id: room["id"]) == true do # TODO: just pass the room entirely
           {:ok, %{dest | adapter: adapter.name, room: room}}
         else
           {:error, {:not_a_member, redir}}

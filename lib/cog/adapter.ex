@@ -31,33 +31,41 @@ defmodule Cog.Adapter do
       end
 
       def handle_call({:receive_message, sender, room, message, id, initial_context}, _from, state) do
-        message = payload(sender, room, message, id, initial_context)
+        Logger.warn(">>>>>>> sender (initial) = #{inspect sender, pretty: true}")
+
+        # HACK
+        sender = sender
+        |> Poison.encode!
+        |> Cog.Messages.Sender.decode!
+
+        # # HACK
+        # room = room
+        # |> Poison.encode!
+        # |> Cog.Messages.Room.decode!
+
+        message = %Cog.Messages.AdapterRequest{id: id,
+                                               sender: sender,
+                                               room: room,
+                                               text: message,
+                                               initial_context: initial_context,
+                                               adapter: name(),
+                                               module: to_string(__MODULE__), # TODO: I'd like to just leave it as a module
+                                               reply: reply_topic()}
+
         Carrier.Messaging.Connection.publish(state.conn, message, routed_by: "/bot/commands")
         {:reply, :ok, state}
       end
 
       def handle_info({:publish, topic, message}, state) do
         if topic == reply_topic() do
-          payload = Poison.decode!(message)
-          send_message(payload["room"], payload["response"])
+          payload = Cog.Messages.SendMessage.decode!(message)
+          send_message(payload.room, payload.response)
         end
-
         {:noreply, state}
       end
 
       def handle_info(_, state) do
         {:noreply, state}
-      end
-
-      defp payload(sender, room, text, id, initial_context) do
-        %{id: id,
-          sender: sender,
-          room: room,
-          text: text,
-          initial_context: initial_context,
-          adapter: name(),
-          module: __MODULE__,
-          reply: reply_topic()}
       end
 
       defp topic() do
@@ -70,6 +78,7 @@ defmodule Cog.Adapter do
 
       def chat_adapter?,
         do: true
+
       defoverridable [chat_adapter?: 0]
     end
   end

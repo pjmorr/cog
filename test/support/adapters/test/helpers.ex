@@ -9,14 +9,14 @@ defmodule Cog.Adapters.Test.Helpers do
     reply_topic = "/bot/adapters/test/send_message"
     id = UUID.uuid4(:hex)
     initial_context = %{}
-    payload = %{id: id,
-                sender: %{id: username, handle: username},
-                room: %{id: "general", name: "general"},
-                text: message,
-                adapter: "test",
-                initial_context: initial_context,
-                module: Cog.Adapters.Test,
-                reply: reply_topic}
+    payload = %Cog.Messages.AdapterRequest{id: id,
+                                           sender: %Cog.Messages.Sender{id: username, handle: username},
+                                           room: %Cog.Messages.Room{id: "general", name: "general"},
+                                           text: message,
+                                           adapter: "test",
+                                           initial_context: initial_context,
+                                           module: to_string(Cog.Adapters.Test),
+                                           reply: reply_topic}
     Connection.subscribe(mq_conn, reply_topic)
     Connection.publish(mq_conn, payload, routed_by: "/bot/commands")
 

@@ -42,7 +42,7 @@ defmodule Cog.Commands.Alias.List do
   def list_command_aliases(%{options: %{"help" => true}}, _args),
     do: show_usage
   def list_command_aliases(req, arg_list) do
-    user_id = req.user["id"]
+    user_id = req.user.id
 
     case Helpers.get_args(arg_list, max: 1) do
       {:ok, [pattern]} ->

@@ -38,7 +38,7 @@ defmodule Cog.Commands.Which do
 
   def handle_message(req, state) do
     results = with {:ok, [arg]} <- Helpers.get_args(req.args, count: 1),
-                   user_id = req.user["id"],
+                    user_id = req.user.id,
                    do: which(user_id, arg)
 
     case results do

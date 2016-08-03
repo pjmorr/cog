@@ -28,7 +28,7 @@ defmodule Cog.Commands.Alias.Create do
   def create_new_user_command_alias(req, arg_list) do
     case Helpers.get_args(arg_list, 2) do
       {:ok, [alias_name, pipeline]} ->
-        params = %{name: alias_name, pipeline: pipeline, user_id: req.user["id"]}
+        params = %{name: alias_name, pipeline: pipeline, user_id: req.user.id}
         changeset = UserCommandAlias.changeset(%UserCommandAlias{}, params)
 
         case Repo.insert(changeset) do

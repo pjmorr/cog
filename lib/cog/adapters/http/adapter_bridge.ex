@@ -35,7 +35,7 @@ defmodule Cog.Adapters.Http.AdapterBridge do
     {:noreply, Map.put(state, id, from)}
   end
   def handle_call({:finish_request, room, response}, _from, state) do
-    id = Map.get(room, "id")
+    id = room["id"]
     case Map.fetch(state, id) do
       {:ok, requestor} ->
         GenServer.reply(requestor, response)

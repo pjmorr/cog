@@ -33,10 +33,8 @@ defmodule Cog.V1.TriggerExecutionController do
                         raw_body: get_raw_body(conn),
                         body: get_parsed_body(conn)}
 
-            requestor = requestor_map(trigger_id, as_user, trigger.name)
-
-            case AdapterBridge.submit_request(requestor, request_id, context, trigger.pipeline, timeout) do
-              %{"status" => "ok"} ->
+            case AdapterBridge.submit_request(%{id: as_user}, request_id, context, trigger.pipeline, timeout) do
+              "ok" ->
                 conn |> send_resp(:no_content, "")
               {:error, :timeout} ->
                 conn
@@ -74,16 +72,6 @@ defmodule Cog.V1.TriggerExecutionController do
   end
 
   ########################################################################
-
-  # This is the requestor map that will eventually make its way into
-  # the executor and subsequently to commands. It's how we'll expose
-  # trigger metadata to commands, for instance.
-  defp requestor_map(trigger_id, trigger_user, trigger_name) do
-    %{id: trigger_user,
-      trigger_user: trigger_user,
-      trigger_id: trigger_id,
-      trigger_name: trigger_name}
-  end
 
   # Convert a header list into a map, accumulating multiple values
   # into lists. Single values remain as single values.
