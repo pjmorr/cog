@@ -95,7 +95,7 @@ defmodule Cog.Command.Pipeline.Destination do
     {adapter, destination} = adapter_destination(redir, origin_adapter)
     case adapter.lookup_room(destination) do
       {:ok, room} ->
-        if adapter.room_writeable?(id: room["id"]) == true do # TODO: just pass the room entirely
+        if adapter.room_writeable?(id: room.id) == true do # TODO: just pass the room entirely
           {:ok, %{dest | adapter: adapter.name, room: room}}
         else
           {:error, {:not_a_member, redir}}

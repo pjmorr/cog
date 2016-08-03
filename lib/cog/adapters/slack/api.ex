@@ -120,7 +120,7 @@ defmodule Cog.Adapters.Slack.API do
       {_cached, maybe_match} = Enum.map_reduce(result["members"], nil,
         fn(user, previous_match) ->
           cached = cache(user, state.ttl)
-          if user.name == handle do
+          if user["name"] == handle do
             {cached, cached}
           else
             {cached, previous_match}

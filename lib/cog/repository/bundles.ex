@@ -340,8 +340,6 @@ defmodule Cog.Repository.Bundles do
   # versions a relay claims to be serving
 
   # TODO: maybe turn this into `version_exists?(name, version_string)`?
-
-  # TODO: could also accept Cog.Messages.Relay.Bundle struct??
   def verify_version_exists(%{name: bundle_name, version: version}) do
     case Repo.one(bundle_version(bundle_name, version)) do
       %BundleVersion{}=bundle_version ->

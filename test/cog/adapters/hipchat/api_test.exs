@@ -35,7 +35,7 @@ defmodule Cog.Adapters.HipChat.APITest do
     use_cassette do
       HipChat.API.start_link(config)
       {:ok, room} = HipChat.API.lookup_room(name: "ci_bot_testing")
-      assert {:ok, _} = HipChat.API.send_message(%{"id" => room["id"]}, "test")
+      assert {:ok, _} = HipChat.API.send_message(%{"id" => room.id}, "test")
     end
   end
 end

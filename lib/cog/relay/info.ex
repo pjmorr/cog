@@ -102,7 +102,6 @@ defmodule Cog.Relay.Info do
                                           name: &1.name,
                                           config: &1.config}))
 
-      # TODO: These need to be messages instead of bare maps
       if config_hash != signature do
         respond(%Cog.Messages.Relay.DynamicConfigResponse{configs: grouped_configs,
                                                           changed: true,
