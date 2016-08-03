@@ -28,7 +28,7 @@ defmodule Cog.Commands.Alias.Delete do
   def delete_command_alias(%{options: %{"help" => true}}, _args),
     do: show_usage
   def delete_command_alias(req, arg_list) do
-    user_id = req.user.id
+    user_id = req.user["id"]
 
     case Helpers.get_args(arg_list, 1) do
       {:ok, [alias]} ->

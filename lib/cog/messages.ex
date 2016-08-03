@@ -1,22 +1,13 @@
 # TODO: DOCUMENT THE USAGE OF ALL THESE MESSAGE TYPES}
-# TODO: Add documentation macro to the "field" function call??
-defmodule Cog.Messages.Room do
-  use Conduit
-
-  field :id, :string, required: true
-  # Somehow, we don't always have a name??
-  field :name, :string, required: false
-end
 
 defmodule Cog.Messages.SendMessage do
   use Conduit
 
   field :id, :string, required: true
   field :response, :string, required: true
-  field :room, :map, required: true #Cog.Messages.Room, required: true
+  field :room, :map, required: true
 end
 
-# Was Cog.Command.Response
 defmodule Cog.Messages.CommandResponse do
   use Conduit
 
@@ -26,21 +17,9 @@ defmodule Cog.Messages.CommandResponse do
 
   # TODO: map or array... can this be expressed?
   # Not all responses currently have bodies, either... see GenCommand#send_error_reply
-  field :body, :map_or_array_of_maps # UGH
+  field :body, :map_or_array_of_maps, required: false # UGH
 end
 
-defmodule Cog.Messages.User do
-  use Conduit
-
-  # This is effectively a subset of Cog.Models.User :/
-  field :email_address, :string, required: true
-  field :first_name, :string, required: true
-  field :last_name, :string, required: true
-  field :username, :string, required: true # cog username
-  field :id, :string, required: true
-end
-
-# Was Cog.Command.Request
 defmodule Cog.Messages.Command do
   use Conduit
 
@@ -56,31 +35,14 @@ defmodule Cog.Messages.Command do
   field :invocation_step, :string, required: false
   field :reply_to, :string, required: true
 
-  # TODO: rename this "sender"?
-  field :requestor, Cog.Messages.Sender, required: true
+  field :requestor, :map, required: true
 
-  field :room, :map, required: true #Cog.Messages.Room, required: true
+  field :room, :map, required: true
 
   field :service_token, :string, required: true
   field :services_root, :string, required: true
 
-  field :user, Cog.Messages.User, required: true
-end
-
-defmodule Cog.Messages.Sender do
-  use Conduit
-  # all fields *should be* required; id and handle are used most
-  # frequently, but the rest are used when auto-registering users with
-  # Cog (and that only currently works with Slack, by design)
-  #
-  # HOWEVER
-  #
-  # This doesn't really apply for trigger users...
-  field :id, :string, required: false # chat client internal ID
-  field :handle, :string, required: false # chat handle
-  field :first_name, :string, required: false
-  field :last_name, :string, required: false
-  field :email, :string, required: false
+  field :user, :map, required: true
 end
 
 defmodule Cog.Messages.AdapterRequest do
@@ -89,9 +51,9 @@ defmodule Cog.Messages.AdapterRequest do
   # Command coming in from Chat
   field :text, :string, required: true
 
-  field :sender, Cog.Messages.Sender, required: true
+  field :sender, :map, required: true
 
-  field :room, :map, required: true #Cog.Messages.Room, required: true
+  field :room, :map, required: true
   field :reply, :string, required: true
 
   # Adapter module... TODO: resolve it to an actual Module reference?

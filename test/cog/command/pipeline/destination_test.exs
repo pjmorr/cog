@@ -86,7 +86,7 @@ defmodule Cog.Command.Pipeline.DestinationTest do
 
   test "'me' is resolved to current user" do
     {:ok, resolved} = Destination.process(["me"],
-                                          %Cog.Messages.Sender{id: "sender"},
+                                          %{id: "sender"},
                                           :origin_room,
                                           DestinationTestAdapter)
 

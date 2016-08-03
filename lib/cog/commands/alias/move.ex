@@ -35,7 +35,7 @@ defmodule Cog.Commands.Alias.Move do
   def move_command_alias(%{options: %{"help" => true}}, _args),
     do: show_usage
   def move_command_alias(req, arg_list) do
-    user_id = req.user.id
+    user_id = req.user["id"]
 
     case Helpers.get_args(arg_list, 2) do
       {:ok, [src, dest]} ->

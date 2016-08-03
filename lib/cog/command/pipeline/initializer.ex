@@ -61,7 +61,7 @@ defmodule Cog.Command.Pipeline.Initializer do
     do: {:noreply, state}
 
   defp check_history(payload, state) do
-    uid = payload.sender.id
+    uid = payload.sender["id"]
     text = String.strip(payload.text)
     if text == state.history_token do
       retrieve_last(uid, payload, state)
@@ -99,34 +99,34 @@ defmodule Cog.Command.Pipeline.Initializer do
 
   defp self_register_user(request, true, state) do
     sender = request.sender
-    case Users.by_chat_handle(sender.handle, request.adapter) do
+    case Users.by_chat_handle(sender["handle"], request.adapter) do
       {:ok, _} ->
         :ok
       {:error, :not_found} ->
-        case find_available_username(sender.handle) do
+        case find_available_username(sender["handle"]) do
           {:ok, username} ->
             case Users.new(%{"username" => username,
-                             "first_name" => sender.first_name,
-                             "last_name" => sender.last_name,
-                             "email_address" => sender.email,
+                             "first_name" => sender["first_name"],
+                             "last_name" => sender["last_name"],
+                             "email_address" => sender["email"],
                              "password" => Passwords.generate_password(12)}) do
               {:ok, user} ->
-                case ChatHandles.set_handle(user, request.adapter, sender.handle) do
+                case ChatHandles.set_handle(user, request.adapter, sender["handle"]) do
                   {:ok, _} ->
                     self_registration_success(user, request, state)
                     :ok
                   error ->
-                    Logger.error("Failed to auto-register user '#{sender.handle}': #{inspect error}")
+                    Logger.error("Failed to auto-register user '#{sender["handle"]}': #{inspect error}")
                     self_registration_failed(request, state)
                     error
                 end
               error ->
-                Logger.error("Failed to auto-register user '#{sender.handle}': #{inspect error}")
+                Logger.error("Failed to auto-register user '#{sender["handle"]}': #{inspect error}")
                 self_registration_failed(request, state)
                 :error
             end
           _ ->
-            Logger.error("Failed to auto-register user '#{sender.handle}'. No suitable username was found.")
+            Logger.error("Failed to auto-register user '#{sender["handle"]}'. No suitable username was found.")
             self_registration_failed(request, state)
             :error
         end

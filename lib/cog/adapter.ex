@@ -31,18 +31,6 @@ defmodule Cog.Adapter do
       end
 
       def handle_call({:receive_message, sender, room, message, id, initial_context}, _from, state) do
-        Logger.warn(">>>>>>> sender (initial) = #{inspect sender, pretty: true}")
-
-        # HACK
-        sender = sender
-        |> Poison.encode!
-        |> Cog.Messages.Sender.decode!
-
-        # # HACK
-        # room = room
-        # |> Poison.encode!
-        # |> Cog.Messages.Room.decode!
-
         message = %Cog.Messages.AdapterRequest{id: id,
                                                sender: sender,
                                                room: room,

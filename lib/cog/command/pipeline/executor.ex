@@ -415,14 +415,6 @@ defmodule Cog.Command.Pipeline.Executor do
   end
 
   defp publish_response(message, room, adapter, state) do
-
-    Logger.warn(">>>>>>> room = #{inspect room, pretty: true}")
-
-    # HACK need to do this earlier in processing
-    # room = room
-    # |> Poison.encode!
-    # |> Cog.Messages.Room.decode!
-
     response = %Cog.Messages.SendMessage{response: message,
                                          id: state.id,
                                          room: room}
@@ -456,7 +448,7 @@ defmodule Cog.Command.Pipeline.Executor do
                                         user: user}) do
 
     PipelineEvent.initialized(id, request.text, request.adapter,
-                              user.username, request.sender.handle)
+                              user.username, request.sender["handle"])
     |> Probe.notify
   end
 
@@ -487,7 +479,7 @@ defmodule Cog.Command.Pipeline.Executor do
   defp alert_unregistered_user(state) do
     {:ok, adapter} = Cog.adapter_module(state.request.adapter)
     request = state.request
-    handle = request.sender.handle
+    handle = request.sender["handle"]
     creators = user_creator_handles(request)
 
     context = %{
@@ -628,9 +620,9 @@ defmodule Cog.Command.Pipeline.Executor do
   defp sender_name(state) do
     adapter = originating_adapter(state)
     if adapter.chat_adapter? do
-      adapter.mention_name(state.request.sender.handle)
+      adapter.mention_name(state.request.sender["handle"])
     else
-      state.request.sender.id
+      state.request.sender["id"]
     end
   end
 
@@ -643,12 +635,6 @@ defmodule Cog.Command.Pipeline.Executor do
     provider  = request.adapter
     requestor = request.sender |> Map.put_new("provider", provider)
     room      = request.room
-
-    # HACK
-    user      = user
-    |> Cog.Models.EctoJson.render
-    |> Poison.encode!
-    |> Cog.Messages.User.decode!
 
     %Cog.Messages.Command{
       command:         plan.parser_meta.full_command_name,
@@ -711,7 +697,7 @@ defmodule Cog.Command.Pipeline.Executor do
 
     if adapter_module.chat_adapter? do
       adapter   = request.adapter
-      sender_id = request.sender.id
+      sender_id = request.sender["id"]
 
       user = Queries.User.for_chat_provider_user_id(sender_id, adapter)
       |> Repo.one
@@ -723,7 +709,7 @@ defmodule Cog.Command.Pipeline.Executor do
           {:ok, user}
       end
     else
-      cog_name = request.sender.id
+      cog_name = request.sender["id"]
       case Repo.get_by(Cog.Models.User, username: cog_name) do
         %Cog.Models.User{}=user ->
           {:ok, user}

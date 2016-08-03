@@ -10,8 +10,8 @@ defmodule Cog.Adapters.Test.Helpers do
     id = UUID.uuid4(:hex)
     initial_context = %{}
     payload = %Cog.Messages.AdapterRequest{id: id,
-                                           sender: %Cog.Messages.Sender{id: username, handle: username},
-                                           room: %Cog.Messages.Room{id: "general", name: "general"},
+                                           sender: %{id: username, handle: username},
+                                           room: %{id: "general", name: "general"},
                                            text: message,
                                            adapter: "test",
                                            initial_context: initial_context,
