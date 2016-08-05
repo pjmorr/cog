@@ -56,14 +56,13 @@ defmodule Cog.Messages.AdapterRequest do
   field :room, :map, required: true
   field :reply, :string, required: true
 
-  # Adapter module... TODO: resolve it to an actual Module reference?
-  field :module, :string, required: true
-
   field :initial_context, :map, required: true
 
   field :id, :string, required: true
 
-  # Short name of adapter, e.g. "slack"
+  field :module, :string, required: false
+
+  # Name of provider, e.g. "slack"
   field :adapter, :string, required: true
 end
 
