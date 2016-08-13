@@ -30,18 +30,20 @@ defmodule Cog.Adapters.Http.AdapterBridge do
 
   # TODO: pass timeout in order to queue up clearing the data from the map?
   def handle_call({:submit_request, requestor, id, initial_context, pipeline}, from, state) do
-    room = %{"id" => id}
+    room = %Cog.Chat.Room{id: id,
+                          name: id,
+                          provider: "http",
+                          is_dm: false} # TODO: Is this a DM or not?
     Cog.Adapters.Http.receive_message(requestor, room, pipeline, id, initial_context)
     {:noreply, Map.put(state, id, from)}
   end
-  def handle_call({:finish_request, room, response}, _from, state) do
-    id = Map.get(room, "id")
-    case Map.fetch(state, id) do
+  def handle_call({:finish_request, room_id, response}, _from, state) do
+    case Map.fetch(state, room_id) do
       {:ok, requestor} ->
         GenServer.reply(requestor, response)
-        {:reply, :ok, Map.delete(state, id)}
+        {:reply, :ok, Map.delete(state, room_id)}
       :error ->
-        Logger.warn("Handling a finish_request call for unknown request `#{id}`")
+        Logger.warn("Handling a finish_request call for unknown request `#{room_id}`")
         {:reply, :error, state}
     end
   end
