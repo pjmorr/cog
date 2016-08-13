@@ -18,11 +18,17 @@ defmodule Cog.Chat.Provider do
 
   @callback leave(room :: String.t) :: :ok | {:error, term}
 
+  # Sends a message from Cog into the provider
   @callback send_message(target :: String.t, message :: String.t) :: :ok | {:error, term}
 
   @callback mention_name(handle :: String.t) :: String.t
 
   @callback display_name :: String.t
+
+  # INTERESTING
+  #
+  # A provider doesn't have an interface for actually injecting
+  # messages _into_ Cog; only receiving them.
 
   defmacro __using__(_) do
     quote do

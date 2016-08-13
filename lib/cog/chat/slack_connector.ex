@@ -181,16 +181,20 @@ defmodule Cog.Chat.SlackConnector do
   end
 
   defp make_user(user) do
-    chat_user = %User{id: user.id,
-                      first_name: user.profile.first_name,
-                      last_name: user.profile.last_name,
-                      handle: user.name,
-                      provider: "slack"}
-   if user.is_bot == false do
-     %{chat_user | email: user.profile.email}
-   else
-    chat_user
-   end
+    if user.is_bot do
+      %User{id: user.id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            handle: user.name,
+            provider: "slack"}
+    else
+      %User{id: user.id,
+            first_name: user.profile.first_name,
+            last_name: user.profile.last_name,
+            handle: user.name,
+            provider: "slack",
+            email: user.profile.email}
+    end
   end
 
   defp annotate(%{type: "message", user: user}=message, state) do

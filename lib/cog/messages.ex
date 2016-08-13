@@ -63,6 +63,7 @@ defmodule Cog.Messages.AdapterRequest do
   field :module, :string, required: false
 
   # Name of provider, e.g. "slack"
+  # TODO: This should be "provider"
   field :adapter, :string, required: true
 end
 

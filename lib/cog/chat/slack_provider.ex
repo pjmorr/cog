@@ -17,6 +17,7 @@ defmodule Cog.Chat.SlackProvider do
     GenServer.start_link(__MODULE__, [config], name: __MODULE__)
   end
 
+  # TODO: THIS ISN'T PART OF THE PROVIDER BEHAVIOUR YET
   def lookup_room(id),
     do: GenServer.call(__MODULE__, {:lookup_room, id}, :infinity)
 
