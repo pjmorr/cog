@@ -13,9 +13,10 @@ config :cog, :embedded_bundle_version, "0.11.2"
 config :cog,
   adapter: System.get_env("COG_ADAPTER") || "slack"
 
+# TODO: How are these values layered across environments?
+# TODO: how does the test "swapping" interact?
 config :cog, Cog.Chat.Adapter,
-  providers: [slack: Cog.Chat.SlackProvider,
-              http: Cog.Chat.HttpProvider]
+  providers: [http: Cog.Chat.HttpProvider]
 
 config :cog, Cog.Chat.SlackProvider,
   api_token: System.get_env("SLACK_API_TOKEN")

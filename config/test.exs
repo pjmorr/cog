@@ -6,9 +6,12 @@ config :logger, :console,
 config :lager, :handlers,
   [{LagerLogger, [level: :error]}]
 
+# TODO: Somehow, if the :slack entry is here, all the tests (except
+# for the Slack integration tests) fail. If it's gone, the "normal"
+# tests pass, but the integration tests fail.
 config :cog, Cog.Chat.Adapter,
-  providers: [test: Cog.Chat.TestProvider,
-              http: Cog.Chat.HttpProvider],
+  providers: [#slack: Cog.Chat.SlackProvider,
+              test: Cog.Chat.TestProvider],
   chat: :test
 
 config :cog, Cog.Chat.TestProvider,
