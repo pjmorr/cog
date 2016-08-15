@@ -237,7 +237,7 @@ defmodule Cog.Chat.SlackConnector do
  defp annotate(_, _), do: :ignore
 
  defp annotate_message(%{channel: << <<"C">>, _::binary >>=channel, user: userid, text: text}, state) do
-   text = Cog.Adapters.Slack.Formatter.unescape(text)
+   text = Cog.Adapters.Slack.Formatter.unescape(text, state)
    user = lookup_user(userid, state.users, by: :id)
    if user == nil do
      Logger.info("Failed looking up user '#{userid}'.")
@@ -253,7 +253,7 @@ defmodule Cog.Chat.SlackConnector do
    end
  end
  defp annotate_message(%{channel: << <<"D">>, _::binary >>=channel, user: userid, text: text}, state) do
-   text = Cog.Adapters.Slack.Formatter.unescape(text)
+   text = Cog.Adapters.Slack.Formatter.unescape(text, state)
    user = lookup_user(userid, state.users, by: :id)
    if user == nil do
      Logger.info("Failed looking up user '#{userid}'.")

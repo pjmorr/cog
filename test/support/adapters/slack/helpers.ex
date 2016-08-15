@@ -103,7 +103,7 @@ defmodule Cog.Adapters.Slack.Helpers do
             {:ok, nil}
           messages ->
             formatted = Enum.sort(messages, &(&1["ts"] < &2["ts"]))
-            |> Enum.map_join("\n", &(Slack.Formatter.unescape(&1["text"])))
+            |> Enum.map_join("\n", &(&1["text"]))
 
             {:ok, formatted}
         end
