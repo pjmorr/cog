@@ -289,19 +289,26 @@ defmodule Cog.Chat.Slack.Connector do
  defp do_classify_id(<<"@U", id::binary>>, _), do: {:user, "U#{id}"}
  defp do_classify_id(<<"U", id::binary>>, _), do: {:user, "U#{id}"}
  defp do_classify_id(other, slack) do
-
-   # Try it as a channel name as last resort; this is just for tests
-   # to work right now, and should probably go away
-
    try do
-     id = Slack.Lookups.lookup_channel_id("##{other}", slack)
-     {:channel, id}
+     cond do
+       String.at(other, 0) == "#" ->
+         id = Slack.Lookups.lookup_channel_id(other, slack)
+         {:channel, id}
+       String.at(other, 0) == "@" ->
+         id = Slack.Lookups.lookup_user_id(other, slack)
+         {:user, id}
+       true ->
+         # Try it as a channel name as last resort; this is just for tests
+         # to work right now, and should probably go away
+         id = Slack.Lookups.lookup_channel_id("##{other}", slack)
+         {:channel, id}
+     end
    rescue
      BadMapError ->
        # TODO: this is a workaround for a too-permissive library call;
        # that should really be fixed. In the meantime...
        Logger.warn("Could not classify Slack identifier '#{other}'")
-       :error
+     :error
    end
  end
 
