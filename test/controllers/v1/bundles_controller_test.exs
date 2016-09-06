@@ -64,24 +64,33 @@ defmodule Cog.V1.BundlesControllerTest do
     end
   end)
 
+  test "rejects an unsupported bundle version", %{authed: requestor} do
+    config_path = make_config_file("unsupported_config.yaml", contents: unsupported_config)
+    upload = %Plug.Upload{path: config_path, filename: "unsupported_config.yaml"}
+
+    conn = api_request(requestor, :post, "/v1/bundles", body: %{bundle: %{config_file: upload}}, content_type: :multipart)
+
+    %{"errors" => errors} = Poison.decode!(conn.resp_body)
+
+    assert errors == ["Invalid config file.",
+                      "Error near #/cog_bundle_version: cog_bundle_version 2 is not supported. Please update your bundle config to version 4."]
+  end
+
   test "accepts an upgradable config", %{authed: requestor} do
-    config_path = make_config_file("old_config.yaml", contents: old_config)
-    upload = %Plug.Upload{path: config_path, filename: "old_config.yaml"}
+    config_path = make_config_file("upgradable_config.yaml", contents: upgradable_config)
+    upload = %Plug.Upload{path: config_path, filename: "upgradable_config.yaml"}
 
     conn = api_request(requestor, :post, "/v1/bundles", body: %{bundle: %{config_file: upload}}, content_type: :multipart)
 
     response = Poison.decode!(conn.resp_body)
 
-    warnings = get_in(response, ["warnings"])
     bundle_version_id = get_in(response, ["bundle_version", "id"])
     bundle_version = Cog.Repository.Bundles.version(bundle_version_id)
     config = Spanner.Config.Parser.read_from_file!(config_path)
 
     assert conn.status == 201
+    assert bundle_version.config_file == config
     assert bundle_version.bundle.name == config["name"]
-    assert warnings == [
-      "Warning near #/cog_bundle_version: Bundle config version 2 has been deprecated. Please update to version 3.",
-      "Warning near #/commands/date/enforcing: Non-enforcing commands have been deprecated. Please update your bundle config to version 3."]
   end
 
   test "rejects a file with an improper extension", %{authed: requestor} do
@@ -432,7 +441,7 @@ defmodule Cog.V1.BundlesControllerTest do
     """
   end
 
-  defp old_config do
+  defp unsupported_config do
     """
     ---
     # Format version
@@ -468,4 +477,38 @@ defmodule Cog.V1.BundlesControllerTest do
     """
   end
 
+  defp upgradable_config do
+    """
+    ---
+    # Format version
+    cog_bundle_version: 4
+
+    name: test_bundle
+    version: "0.1.0"
+    description: An upgradable config
+    permissions:
+    - test_bundle:date
+    - test_bundle:time
+    docker:
+      image: operable-bundle/test_bundle
+      tag: v0.1.0
+    commands:
+      date:
+        description: Prints the date
+        executable: /usr/local/bin/date
+        enforcing: false
+        options:
+          option1:
+            type: string
+            description: An option
+            required: false
+            short_flag: o
+        rules:
+          - when command is test_bundle:date allow
+      time:
+        executable: /usr/local/bin/time
+        rules:
+        - when command is test_bundle:time must have test_bundle:time
+    """
+  end
 end
