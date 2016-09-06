@@ -94,11 +94,11 @@ defmodule Cog.Bundle.Config do
   - `modules`: a list of modules to be included in the bundle
 
   """
-  def gen_config(name, description, version, modules, template_dir) do
+  def gen_config(name, description, version, author, homepage, modules, template_dir) do
     # We create single key/value pair maps for each
     # top-level key in the overall configuration, and then merge all
     # those maps together.
-    Enum.reduce([gen_bundle(name, description, version),
+    Enum.reduce([gen_bundle(name, description, version, author, homepage),
                  gen_commands(modules),
                  gen_permissions(name, modules),
                  gen_templates(template_dir)],
@@ -106,11 +106,13 @@ defmodule Cog.Bundle.Config do
   end
 
   # Generate top-level bundle configuration
-  defp gen_bundle(name, description, version) do
+  defp gen_bundle(name, description, version, author, homepage) do
     %{"name" => name,
       "description" => description,
       "type" => "elixir",
-      "version" => version}
+      "version" => version,
+      "author" => author,
+      "homepage" => homepage}
   end
 
   # Generate the union of all permissions required by commands in the
@@ -161,6 +163,11 @@ defmodule Cog.Bundle.Config do
       %{"options" => GenCommand.Base.options(module),
         "rules" => GenCommand.Base.rules(module) |> Enum.sort,
         "description" => GenCommand.Base.description(module),
+        "long_description" => GenCommand.Base.long_description(module),
+        "examples" => GenCommand.Base.examples(module),
+        "notes" => GenCommand.Base.notes(module),
+        "arguments" => GenCommand.Base.arguments(module),
+        "subcommands" => GenCommand.Base.subcommands(module),
         "documentation" => case Code.get_docs(module, :moduledoc) do
                              {_line, doc} ->
                                # If a module doesn't have a module doc,
